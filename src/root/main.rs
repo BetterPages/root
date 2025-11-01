@@ -7,7 +7,7 @@ use request::{
 use std::fs;
 use tonic::{Status, transport::Server};
 
-use resolver::resolve;
+use resolver::{resolve_domain, resolve_path};
 
 const GLOBAL_404: &[u8] = "404.html".as_bytes();
 
@@ -26,7 +26,7 @@ impl RequestService for RequestGreeter {
     ) -> Result<tonic::Response<Response>, Status> {
         let req = request.into_inner();
 
-        let fs_path = &resolve(&req.host, &req.path);
+        let fs_path = format!("{}{}", resolve_domain(&req.host), resolve_path(&req.path));
         let data = match fs_path {
             Some(fs_path) => fs::read(fs_path).unwrap(),
             None => GLOBAL_404.to_vec(),
