@@ -9,6 +9,7 @@ use tonic::{Status, transport::Server};
 
 use resolver::{resolve_domain, resolve_path};
 
+// This should probably be cleaned up into using a file instead.
 const GLOBAL_404: &[u8] =
     "I don't know what you were looking for, but you hit the global 404.".as_bytes();
 
@@ -30,7 +31,14 @@ impl RequestService for RequestGreeter {
         let domain = resolve_domain(&req.host);
         let fs_path = resolve_path(&domain, &req.path);
         let data = match fs_path {
-            Some(ref fs_path) => fs::read(fs_path).unwrap(),
+            Some(ref fs_path) => {
+                if fs_path.starts_with(&domain) {
+                    fs::read(fs_path).unwrap()
+                } else {
+                    // This should probably be cleaned up into using a file instead.
+                    b"No, no you don't, I see what you're doing.".to_vec()
+                }
+            }
             None => GLOBAL_404.to_vec(),
         };
 
