@@ -29,8 +29,6 @@ impl RequestService for RequestGreeter {
 
         let domain = resolve_domain(&req.host);
         let fs_path = resolve_path(&domain, &req.path);
-        println!("{:?}", fs_path);
-        println!("{:?}", domain);
         let data = match fs_path {
             Some(ref fs_path) => fs::read(fs_path).unwrap(),
             None => GLOBAL_404.to_vec(),

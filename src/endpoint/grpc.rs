@@ -1,7 +1,6 @@
 use futures_executor::block_on;
 use request::request_service_client::RequestServiceClient;
 use std::sync::{Arc, LazyLock, Mutex};
-use std::time::Instant;
 use tonic::transport::Channel;
 
 pub mod request {
@@ -22,13 +21,11 @@ pub async fn get(
     path: String,
     host: String,
 ) -> Result<request::Response, Box<dyn std::error::Error>> {
-    let time = Instant::now();
     // Scope is intentionally different for mutex cloning
     let mut client = { CLIENT.lock()?.clone() };
 
     let request = tonic::Request::new(request::Request { path, host });
     let response = client.get(request).await?;
 
-    println!("{}", time.elapsed().as_micros());
     Ok(response.into_inner())
 }

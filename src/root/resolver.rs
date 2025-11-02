@@ -1,10 +1,9 @@
 use std::collections::HashMap;
 use std::env::{VarError, var};
-use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::{LazyLock, Mutex};
 
-const STORAGE_PATH: &str = ".";
+const STORAGE_PATH: &str = "./test";
 static WILDCARD: LazyLock<String> = LazyLock::new(|| get_wildcard());
 
 static MAPPINGS: LazyLock<Mutex<HashMap<String, String>>> =
@@ -26,7 +25,7 @@ fn get_wildcard() -> String {
 
 pub fn init_mappings() -> HashMap<String, String> {
     let mut mappings = HashMap::new();
-    mappings.insert("localhost".into(), "test_project".into());
+    mappings.insert("localhost".into(), "out".into());
     mappings
 }
 
@@ -41,7 +40,7 @@ pub fn resolve_domain(host: &str) -> PathBuf {
 /// Turn a path into a Path
 pub fn resolve_path(base: &Path, path: &str) -> Option<PathBuf> {
     // TODO: This could probably be done cleaner. How? Thats a good question.
-    let end_path = Path::new(STORAGE_PATH).join(base.join(".".to_string() + path));
+    let end_path = base.join(".".to_string() + path);
     if end_path.exists() {
         if end_path.is_dir() {
             Some(end_path.join("index.html"))
